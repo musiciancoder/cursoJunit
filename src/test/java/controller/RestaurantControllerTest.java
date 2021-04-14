@@ -39,7 +39,9 @@ public class RestaurantControllerTest {
 	
 	public static final List<TurnRest> TURN_LIST  = new ArrayList<>();
 	
-	public static final RestaurantRest RESTAURANT_REST  = new RestaurantRest();
+    public static final RestaurantRest RESTAURANT_REST  = new RestaurantRest();
+    
+	public static final List<RestaurantRest> RESTAURANT_REST_LIST  = new ArrayList<>();
 	
 	@Mock//inyeccion de dependencias a mockear
 	RestaurantService restaurantService; 
@@ -66,11 +68,22 @@ public class RestaurantControllerTest {
 	@Test
 	public void getRestaurantByIdTest () throws BookingException{
 		final BookingResponse<RestaurantRest> response = restaurantController.getRestaurantById(RESTAURANT_ID); //se simula una respuesta de tipo BookingResponse<RestaurantRest>
-		
+		//con assertEquals se trata de simular los metodos que setean las propiedades de la respuesta
 		assertEquals(response.getStatus(), SUCCESS_STATUS); //response.getStatus() de la clase BookingResponse.java
 		assertEquals(response.getCode(), SUCCESS_CODE);
 		assertEquals(response.getMessage(), OK);
 		assertEquals(response.getData(), RESTAURANT_REST);
+		
+	}
+	
+	@Test
+	public void getRestaurantsTest() throws BookingException {
+		final BookingResponse<List<RestaurantRest>> response = restaurantController.getRestaurants();
+		//con assertEquals se trata de simular los metodos que setean las propiedades de la respuesta
+		assertEquals(response.getStatus(), SUCCESS_STATUS); //response.getStatus() de la clase BookingResponse.java
+		assertEquals(response.getCode(), SUCCESS_CODE);
+		assertEquals(response.getMessage(), OK);
+		assertEquals(response.getData(), RESTAURANT_REST_LIST);
 		
 	}
 	
