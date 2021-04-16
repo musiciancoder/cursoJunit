@@ -1,5 +1,7 @@
 package com.boot.bookingrestaurantapi.services;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,10 +59,20 @@ public class RestaurantServiceTest {
 		RESTAURANT.setReservations(RESERVATION_LIST);
 	}
 	
+	//con esto probamos hasta antes del orElseThrow() en getRestaurantEntity(), es decir probamos cuando la respuesta trae algo
 	@Test
-	public void getRestaurantByIdTest() throws BookingException {
-		//notar que aunque el metodo getRestaurantById no lleva findById() ni en RestaurantService ni en RestaurantServiceImpl, pero sí lo tiene en el repositorio, y por tal razón se mockea (en la siguiente linea)
+	public void getRestaurantByIdTest() throws BookingException { 
+		//notar que aunque el metodo getRestaurantById no lleva findById() , getRestaurantEntity() si lo lleva y por tal razón se mockea (en la siguiente linea)
 		Mockito.when(restaurantRepository.findById(RESTAURANT_ID)).thenReturn(Optional.of(RESTAURANT));//porque el findById en interface RestaurantRepository es un optional
 		restaurantServiceImpl.getRestaurantById(RESTAURANT_ID);
 	}
+	
+	//con esto probamos el orElseThrow() en getRestaurantEntity(), es decir probamos cuando la respuesta viene vacia
+	@Test (expected = BookingException.class) //para analizar la falla de un test es recomendable escribir la excepcion que se espera que arroje, en este caso expected = BookingException.class, y al final fail ()
+	public void getRestaurantByIdTestError() throws BookingException {  //el nombre getRestaurantByIdTestError() da lo mismo
+		Mockito.when(restaurantRepository.findById(RESTAURANT_ID)).thenReturn(Optional.empty());// el optional viene vacio
+		restaurantServiceImpl.getRestaurantById(RESTAURANT_ID);
+		fail(); //que falle
+	}
+	
 }
