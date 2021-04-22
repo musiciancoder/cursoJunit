@@ -2,6 +2,8 @@ package com.boot.bookingrestaurantapi.services;
 
 
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.boot.bookingrestaurantapi.entities.Reservation;
 import com.boot.bookingrestaurantapi.entities.Restaurant;
 import com.boot.bookingrestaurantapi.entities.Turn;
 import com.boot.bookingrestaurantapi.exceptions.BookingException;
@@ -31,9 +34,19 @@ public class ReservationServiceTest {
 	CreateReservationRest CREATE_RESERVATION_REST = new CreateReservationRest();
 	private static final Restaurant RESTAURANT = new Restaurant();
 	
+	private static final Turn TURN = new Turn();
+	
 	private static final List<Turn> TURN_LIST = new ArrayList<>();
 	
 	private static final Optional<Restaurant> OPTIONAL_RESTAURANT =Optional.of(RESTAURANT);
+	
+	private static final Optional<Restaurant> OPTIONAL_RESTAURANT_EMPTY = Optional.empty();
+	
+	private static final Optional<Turn> OPTIONAL_TURN = Optional.of(TURN);
+	
+	private static final Optional<Reservation> OPTIONAL_RESERVATION_EMPTY = Optional.empty();
+	
+	
 	
 	private final static Date DATE = new Date();
 	private final static Long PERSON = 30L;
@@ -75,16 +88,37 @@ public class ReservationServiceTest {
 		RESTAURANT.setImage(IMAGE);
 		RESTAURANT.setTurns(TURN_LIST);
 		
+		TURN.setId(TURN_ID);
+		TURN.setName(NAME);
+		TURN.setRestaurant(RESTAURANT);
+		
 		CREATE_RESERVATION_REST.setDate(DATE);
 		CREATE_RESERVATION_REST.setPerson(PERSON);
 		CREATE_RESERVATION_REST.setRestaurantId(RESTAURANT_ID);
 		CREATE_RESERVATION_REST.setTurnId(TURN_ID);
 	}
 	
+	//Cuando es exitoso, o sea antes de entrar a los orElseThrow()
 	@Test
 	public void createReservationTest() throws BookingException {
+		//para restaurant not found
 		Mockito.when(restaurantRepository.findById(RESTAURANT_ID)).thenReturn(OPTIONAL_RESTAURANT);
+		//para turn not found
+		Mockito.when(turnRepository.findById(TURN_ID)).thenReturn(OPTIONAL_TURN);
+		//para finfByTurnAndRestaurantById deben agregarse las dependencias mockito-all y mockito-core en el pom, sino no toma esta parte del codigo, se la salta
+		Mockito.when(reservationRepository.findByTurnAndRestaurantId(TURN.getName(), RESTAURANT.getId())).thenReturn(OPTIONAL_RESERVATION_EMPTY);
+		//para el try catch donde esta LOGGER
+		Mockito.when(reservationRepository.save(Mockito.any(Reservation.class))).thenReturn(new Reservation());
 		reservationServiceImpl.createReservation(CREATE_RESERVATION_REST);
+		
+	}
+	
+	//Cuando falla, o sea dentro de los orElseThrow()
+	@Test(expected = BookingException.class)
+	public void createReservationFindByIdTestError() throws BookingException {
+		Mockito.when(restaurantRepository.findById(RESTAURANT_ID)).thenReturn(OPTIONAL_RESTAURANT_EMPTY); //se le pasa el optional vacio para que falle
+        reservationServiceImpl.createReservation(CREATE_RESERVATION_REST);
+		fail();
 		
 	}
 	
