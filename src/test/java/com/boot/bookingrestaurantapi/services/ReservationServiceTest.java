@@ -161,6 +161,24 @@ public class ReservationServiceTest {
 		fail();
 		
 	}
+	
+	//Esto es para probar la parte del try catch
+	public void createReservationInternalErrorTest() throws BookingException {
+	
+		Mockito.when(restaurantRepository.findById(RESTAURANT_ID)).thenReturn(OPTIONAL_RESTAURANT);
+
+		Mockito.when(turnRepository.findById(TURN_ID)).thenReturn(OPTIONAL_TURN);
+	
+		Mockito.when(reservationRepository.findByTurnAndRestaurantId(TURN.getName(), RESTAURANT.getId())).thenReturn(OPTIONAL_RESERVATION_EMPTY);
+	
+		//para q mockito lance una excepcion
+		Mockito.doThrow(Exception.class).when(reservationRepository).save(Mockito.any(Reservation.class));
+		
+	     reservationServiceImpl.createReservation(CREATE_RESERVATION_REST);
+		
+	     fail();
+		
+	}
 
 	
 
