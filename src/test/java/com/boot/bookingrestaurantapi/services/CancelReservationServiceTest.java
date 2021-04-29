@@ -21,7 +21,7 @@ import com.boot.bookingrestaurantapi.services.impl.CancelReservationServiceImpl;
 
 public class CancelReservationServiceTest {
 	
-	private  String LOCATOR = "Burger 7"; //Esto va a reemplazar al String locator de la clase CancelReservationServiceImpl
+	private static final String LOCATOR = "Burger 7"; //Esto va a reemplazar al String locator de la clase CancelReservationServiceImpl
 	private static final String RESERVATION_DELETED = "LOCATOR_DELETED";
 	private static final Reservation RESERVATION = new Reservation();
 	
